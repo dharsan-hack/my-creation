@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Event Storager - Modern media and event storage platform for capturing, organizing, and archiving event memories and assets.">
+    <title>Event Storager | Digital Event & Media Vault</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Background Animated Elements -->
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+    <div class="bg-glow bg-glow-3"></div>
+
+    <!-- Header Navigation -->
+    <header class="header">
+        <div class="container header-container">
+            <a href="#" class="brand-logo">
+                <div class="logo-icon"><i class="fa-solid fa-box-archive"></i></div>
+                <span class="logo-text">Event<span class="gradient-text">Storager</span></span>
+            </a>
+
+            <div class="search-bar-container">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" id="search-input" placeholder="Search events by title, tag, location..." aria-label="Search events">
+                <button id="clear-search-btn" class="clear-btn hidden" title="Clear search"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div class="header-actions">
+                <!-- Guest View (Default when not logged in) -->
+                <div id="auth-guest-controls" class="auth-group">
+                    <button id="open-login-btn" class="btn btn-ghost">
+                        <i class="fa-solid fa-right-to-bracket"></i> Login
+                    </button>
+                    <button id="open-register-btn" class="btn btn-secondary">
+                        <i class="fa-solid fa-user-plus"></i> Sign Up
+                    </button>
+                    <button id="open-upload-modal-btn" class="btn btn-primary">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> Store Event
+                    </button>
+                </div>
+
+                <!-- User View (Shown when logged in) -->
+                <div id="auth-user-controls" class="auth-group hidden">
+                    <div class="user-badge" id="user-badge">
+                        <div class="user-avatar" id="user-avatar-initials">U</div>
+                        <span class="user-name" id="header-user-name">User</span>
+                    </div>
+                    <button id="auth-upload-btn" class="btn btn-primary">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> Store Event
+                    </button>
+                    <button id="logout-btn" class="btn btn-icon-only" title="Logout">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="main-content container">
+        <!-- Hero Section & Stats -->
+        <section class="hero-section">
+            <div class="hero-text">
+                <span class="hero-badge"><i class="fa-solid fa-sparkles"></i> Ultimate Media & Memory Vault</span>
+                <h1 class="hero-title">Organize & Preserve Your <span class="gradient-text">Unforgettable Events</span></h1>
+                <p class="hero-subtitle">Store photos, videos, highlights, and documents for every conference, celebration, or meetup in a unified high-speed vault.</p>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon icon-purple"><i class="fa-solid fa-calendar-check"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-value" id="stat-total-events">0</span>
+                        <span class="stat-label">Stored Events</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon icon-blue"><i class="fa-solid fa-photo-film"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-value" id="stat-media-files">0</span>
+                        <span class="stat-label">Media Files</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon icon-pink"><i class="fa-solid fa-heart"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-value" id="stat-total-likes">0</span>
+                        <span class="stat-label">Total Likes</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon icon-amber"><i class="fa-solid fa-hard-drive"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-value" id="stat-categories">0</span>
+                        <span class="stat-label">Categories</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Controls: Filters & Views -->
+        <section class="controls-section">
+            <div class="filter-pills" id="category-filter-container">
+                <button class="pill-btn active" data-category="All">
+                    <i class="fa-solid fa-layer-group"></i> All Events
+                </button>
+                <button class="pill-btn" data-category="Concert">
+                    <i class="fa-solid fa-music"></i> Concerts
+                </button>
+                <button class="pill-btn" data-category="Conference">
+                    <i class="fa-solid fa-briefcase"></i> Conferences
+                </button>
+                <button class="pill-btn" data-category="Celebration">
+                    <i class="fa-solid fa-cake-candles"></i> Celebrations
+                </button>
+                <button class="pill-btn" data-category="Sports">
+                    <i class="fa-solid fa-trophy"></i> Sports
+                </button>
+                <button class="pill-btn" data-category="Personal">
+                    <i class="fa-solid fa-user-astronaut"></i> Personal
+                </button>
+                <button class="pill-btn" data-category="Other">
+                    <i class="fa-solid fa-folder-open"></i> Other
+                </button>
+            </div>
+
+            <div class="view-options">
+                <span class="results-count" id="results-count-text">Showing 0 events</span>
+                <div class="view-mode-toggle">
+                    <button id="view-grid-btn" class="icon-btn active" title="Grid View"><i class="fa-solid fa-border-all"></i></button>
+                    <button id="view-list-btn" class="icon-btn" title="List View"><i class="fa-solid fa-list-ul"></i></button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Event Cards Grid / List -->
+        <section class="events-gallery-section">
+            <div id="events-grid" class="events-grid">
+                <!-- Dynamic cards populated by script.js -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="empty-state" class="empty-state hidden">
+                <div class="empty-icon"><i class="fa-solid fa-box-open"></i></div>
+                <h3>No Events Found</h3>
+                <p>No stored events match your query or category filter. Store your first event to get started!</p>
+                <button id="empty-upload-btn" class="btn btn-primary mt-4">
+                    <i class="fa-solid fa-plus"></i> Add Event Memory
+                </button>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loading-state" class="loading-state">
+                <div class="spinner"></div>
+                <p>Fetching event vault...</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Authentication Modal (Login / Sign Up) -->
+    <div id="auth-modal" class="modal-backdrop hidden">
+        <div class="modal-card auth-modal-card">
+            <div class="modal-header">
+                <h2><i class="fa-solid fa-shield-halved gradient-icon"></i> Account Portal</h2>
+                <button id="close-auth-modal-btn" class="close-btn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <!-- Auth Tabs -->
+            <div class="auth-tabs">
+                <button id="tab-login" class="auth-tab active"><i class="fa-solid fa-right-to-bracket"></i> Login</button>
+                <button id="tab-register" class="auth-tab"><i class="fa-solid fa-user-plus"></i> Create Account</button>
+            </div>
+
+            <!-- Auth Alert Notice -->
+            <div id="auth-error-alert" class="alert-box error hidden"></div>
+            <div id="auth-success-alert" class="alert-box success hidden"></div>
+
+            <!-- Login Form -->
+            <form id="login-form" class="modal-form auth-form">
+                <div class="form-group">
+                    <label for="login-account">Email or Username <span class="required">*</span></label>
+                    <div class="input-with-icon">
+                        <i class="fa-solid fa-user"></i>
+                        <input type="text" id="login-account" placeholder="Enter username or email address" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="login-password">Password <span class="required">*</span></label>
+                    <div class="input-with-icon">
+                        <i class="fa-solid fa-lock"></i>
+                        <input type="password" id="login-password" placeholder="Enter your password" required>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" id="login-submit-btn" class="btn btn-primary btn-block">
+                        <i class="fa-solid fa-right-to-bracket"></i> Log In
+                    </button>
+                </div>
+            </form>
+
+            <!-- Register Form -->
+            <form id="register-form" class="modal-form auth-form hidden">
+                <div class="form-group">
+                    <label for="reg-username">Username <span class="required">*</span></label>
+                    <div class="input-with-icon">
+                        <i class="fa-solid fa-at"></i>
+                        <input type="text" id="reg-username" placeholder="Choose a unique username" required minlength="3">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="reg-email">Email Address <span class="required">*</span></label>
+                    <div class="input-with-icon">
+                        <i class="fa-solid fa-envelope"></i>
+                        <input type="email" id="reg-email" placeholder="name@example.com" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="reg-password">Password <span class="required">*</span></label>
+                    <div class="input-with-icon">
+                        <i class="fa-solid fa-lock"></i>
+                        <input type="password" id="reg-password" placeholder="Minimum 6 characters" required minlength="6">
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" id="register-submit-btn" class="btn btn-primary btn-block">
+                        <i class="fa-solid fa-user-check"></i> Complete Sign Up
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Upload / Store Event Modal -->
+    <div id="upload-modal" class="modal-backdrop hidden">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2><i class="fa-solid fa-folder-plus gradient-icon"></i> Store New Event Memory</h2>
+                <button id="close-upload-modal-btn" class="close-btn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <form id="event-upload-form" class="modal-form" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="event-title">Event Title <span class="required">*</span></label>
+                    <input type="text" id="event-title" name="title" placeholder="e.g. Summer Music Festival 2026" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col">
+                        <label for="event-category">Category <span class="required">*</span></label>
+                        <select id="event-category" name="category" required>
+                            <option value="Concert">Concert</option>
+                            <option value="Conference">Conference</option>
+                            <option value="Celebration">Celebration</option>
+                            <option value="Sports">Sports</option>
+                            <option value="Personal">Personal</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group col">
+                        <label for="event-location">Location / Venue</label>
+                        <input type="text" id="event-location" name="location" placeholder="e.g. San Francisco, CA">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="event-description">Event Description & Notes</label>
+                    <textarea id="event-description" name="description" rows="3" placeholder="Key highlights, memories, or schedule summary..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="event-tags">Tags (comma separated)</label>
+                    <input type="text" id="event-tags" name="tags" placeholder="e.g. music, festival, VIP, 2026">
+                </div>
+
+                <div class="form-group">
+                    <label>Media Asset Upload <span class="required">*</span></label>
+                    <div class="drop-zone" id="drop-zone">
+                        <input type="file" id="media-file-input" name="file" accept="image/*,video/*,audio/*,application/pdf" required class="file-input-hidden">
+                        <div class="drop-zone-content" id="drop-zone-content">
+                            <div class="drop-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+                            <p class="drop-text">Drag & drop your image, video, audio or doc here</p>
+                            <span class="drop-subtext">or <span class="browse-link">browse from device</span></span>
+                            <span class="file-limits">Supports JPG, PNG, GIF, MP4, MP3, WAV, PDF (Max 50MB)</span>
+                        </div>
+                        <div class="file-preview-container hidden" id="file-preview-container">
+                            <div class="preview-media" id="preview-media-box"></div>
+                            <div class="preview-details">
+                                <span class="preview-filename" id="preview-filename">filename.jpg</span>
+                                <span class="preview-filesize" id="preview-filesize">2.4 MB</span>
+                            </div>
+                            <button type="button" class="remove-file-btn" id="remove-file-btn" title="Remove file"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" id="cancel-upload-btn" class="btn btn-secondary">Cancel</button>
+                    <button type="submit" id="submit-event-btn" class="btn btn-primary">
+                        <i class="fa-solid fa-box-archive"></i> Store Event Memory
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Event Modal -->
+    <div id="edit-modal" class="modal-backdrop hidden">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2><i class="fa-solid fa-pen-to-square gradient-icon"></i> Update Event Memory</h2>
+                <button id="close-edit-modal-btn" class="close-btn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <form id="event-edit-form" class="modal-form" enctype="multipart/form-data">
+                <input type="hidden" id="edit-event-id">
+                
+                <div class="form-group">
+                    <label for="edit-event-title">Event Title <span class="required">*</span></label>
+                    <input type="text" id="edit-event-title" name="title" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col">
+                        <label for="edit-event-category">Category <span class="required">*</span></label>
+                        <select id="edit-event-category" name="category" required>
+                            <option value="Concert">Concert</option>
+                            <option value="Conference">Conference</option>
+                            <option value="Celebration">Celebration</option>
+                            <option value="Sports">Sports</option>
+                            <option value="Personal">Personal</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group col">
+                        <label for="edit-event-location">Location / Venue</label>
+                        <input type="text" id="edit-event-location" name="location">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-event-description">Event Description & Notes</label>
+                    <textarea id="edit-event-description" name="description" rows="3"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-event-tags">Tags (comma separated)</label>
+                    <input type="text" id="edit-event-tags" name="tags">
+                </div>
+
+                <div class="form-group">
+                    <label>Replace Media Asset (Optional)</label>
+                    <div class="drop-zone" id="edit-drop-zone">
+                        <input type="file" id="edit-media-file-input" name="file" accept="image/*,video/*,audio/*,application/pdf" class="file-input-hidden">
+                        <div class="drop-zone-content" id="edit-drop-zone-content">
+                            <div class="drop-icon"><i class="fa-solid fa-arrow-rotate-right"></i></div>
+                            <p class="drop-text">Drag new file or click to replace current file</p>
+                            <span class="file-limits">Leave empty to keep existing media</span>
+                        </div>
+                        <div class="file-preview-container hidden" id="edit-file-preview-container">
+                            <div class="preview-media" id="edit-preview-media-box"></div>
+                            <div class="preview-details">
+                                <span class="preview-filename" id="edit-preview-filename">filename.jpg</span>
+                                <span class="preview-filesize" id="edit-preview-filesize">2.4 MB</span>
+                            </div>
+                            <button type="button" class="remove-file-btn" id="edit-remove-file-btn" title="Remove new file"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" id="cancel-edit-btn" class="btn btn-secondary">Cancel</button>
+                    <button type="submit" id="submit-edit-btn" class="btn btn-primary">
+                        <i class="fa-solid fa-floppy-disk"></i> Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Media / Event Lightbox Modal -->
+    <div id="lightbox-modal" class="modal-backdrop hidden">
+        <div class="lightbox-content">
+            <button id="close-lightbox-btn" class="lightbox-close"><i class="fa-solid fa-xmark"></i></button>
+            <div class="lightbox-body">
+                <div class="lightbox-media-wrapper" id="lightbox-media-wrapper">
+                    <!-- Dynamic image/video/audio player -->
+                </div>
+                <div class="lightbox-details">
+                    <div class="lb-header-line">
+                        <span class="category-tag" id="lb-category">Category</span>
+                        <span class="lb-author" id="lb-author"><i class="fa-solid fa-user"></i> <span id="lb-author-name">Anonymous</span></span>
+                    </div>
+                    <h2 id="lb-title">Event Title</h2>
+                    <p class="lb-meta"><i class="fa-regular fa-clock"></i> <span id="lb-date">Date</span> &bull; <i class="fa-solid fa-location-dot"></i> <span id="lb-location">Location</span></p>
+                    <p class="lb-description" id="lb-description">Description text...</p>
+                    <div class="lb-tags" id="lb-tags"></div>
+                    
+                    <div class="lb-actions">
+                        <button id="lb-like-btn" class="btn btn-secondary">
+                            <i class="fa-solid fa-heart"></i> <span id="lb-like-count">0</span> Likes
+                        </button>
+                        <a id="lb-download-btn" href="#" download class="btn btn-secondary">
+                            <i class="fa-solid fa-download"></i> Download
+                        </a>
+                        <button id="lb-edit-btn" class="btn btn-secondary">
+                            <i class="fa-solid fa-pen-to-square"></i> Edit
+                        </button>
+                        <button id="lb-delete-btn" class="btn btn-danger">
+                            <i class="fa-solid fa-trash"></i> Delete
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container footer-content">
+            <p>&copy; 2026 Event Storager &bull; All event memories and assets securely archived.</p>
+        </div>
+    </footer>
+
+    <!-- Script File -->
+    <script src="script.js"></script>
+</body>
+</html>
