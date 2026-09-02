@@ -6,7 +6,7 @@ const fs = require('fs');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-require('dotenv').config();
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 
 const Post = require('./models/Post');
 const User = require('./models/User');
@@ -14,6 +14,7 @@ const User = require('./models/User');
 const app = express();
 const PORT = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecretkey_eventstorager_vault_2026';
+const isProduction = process.env.NODE_ENV === 'production';
 
 // --- 1. Auto-create Uploads & Paths Configuration ---
 const uploadsDir = path.join(__dirname, 'uploads');
@@ -25,12 +26,18 @@ if (!fs.existsSync(uploadsDir)) {
 const frontendDir = path.join(__dirname, '../frontend');
 
 // --- 2. Middleware Configuration ---
-app.use(cors());
+app.use(cors({ origin: process.env.FRONTEND_URL || true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve static frontend assets and uploaded files
-app.use(express.static(frontendDir));
+app.get('/health', (req, res) => {
+    res.json({ status: 'ok' });
+});
+
+// Serve static frontend assets locally; Vercel hosts the frontend separately.
+if (!isProduction) {
+    app.use(express.static(frontendDir));
+}
 app.use('/uploads', express.static(uploadsDir));
 
 // --- 3. In-Memory Database Fallback System ---
@@ -38,17 +45,18 @@ let isMongoConnected = false;
 let inMemoryEvents = [];
 let inMemoryUsers = [];
 
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/eventStorager';
+const MONGO_URI = process.env.MONGO_URI;
 
-mongoose.connect(MONGO_URI, {
-    serverSelectionTimeoutMS: 3000
-}).then(async () => {
-    isMongoConnected = true;
-    console.log('✅ Connected to MongoDB Database successfully.');
-    try {
-        const count = await Post.countDocuments();
-        if (count === 0) {
-            await Post.insertMany([
+if (MONGO_URI) {
+    mongoose.connect(MONGO_URI, {
+        serverSelectionTimeoutMS: 3000
+    }).then(async () => {
+        isMongoConnected = true;
+        console.log('✅ Connected to MongoDB Database successfully.');
+        try {
+            const count = await Post.countDocuments();
+            if (count === 0) {
+                await Post.insertMany([
                 {
                     title: 'TechX Global Conference 2026',
                     description: 'Keynotes on AI, cloud infrastructure, and next-gen web frameworks.',
@@ -82,17 +90,20 @@ mongoose.connect(MONGO_URI, {
                     likes: 42,
                     userName: 'Marcus Sterling'
                 }
-            ]);
-            console.log('🌱 Auto-seeded initial event memories into MongoDB.');
+                ]);
+                console.log('🌱 Auto-seeded initial event memories into MongoDB.');
+            }
+        } catch (seedErr) {
+            console.error('Failed to seed MongoDB initial data:', seedErr.message);
         }
-    } catch (seedErr) {
-        console.error('Failed to seed MongoDB initial data:', seedErr.message);
-    }
-}).catch((err) => {
-    isMongoConnected = false;
-    console.warn('⚠️ MongoDB connection could not be established. Falling back to active in-memory storage.');
-    console.warn(`Reason: ${err.message}`);
-});
+    }).catch((err) => {
+        isMongoConnected = false;
+        console.warn('⚠️ MongoDB connection could not be established. Falling back to active in-memory storage.');
+        console.warn(`Reason: ${err.message}`);
+    });
+} else {
+    console.warn('⚠️ MONGO_URI is not configured. Using active in-memory storage.');
+}
 
 // Seed sample events for in-memory mode if empty
 function seedInMemoryData() {
@@ -633,9 +644,11 @@ app.delete('/api/posts/:id', optionalAuthMiddleware, async (req, res) => {
 });
 
 // --- 8. Fallback Catch-all for SPA Navigation ---
-app.get('*', (req, res) => {
-    res.sendFile(path.join(frontendDir, 'index.html'));
-});
+if (!isProduction) {
+    app.get('*', (req, res) => {
+        res.sendFile(path.join(frontendDir, 'index.html'));
+    });
+}
 
 // --- 9. Global Error Handling Middleware ---
 app.use((err, req, res, next) => {
@@ -647,6 +660,10 @@ app.use((err, req, res, next) => {
 });
 
 // --- 10. Server Initialization ---
-app.listen(PORT, () => {
-    console.log(`🚀 Event Storager server running on http://localhost:${PORT}`);
-});
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`🚀 Event Storager server running on http://localhost:${PORT}`);
+    });
+}
+
+module.exports = app;

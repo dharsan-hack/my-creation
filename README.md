@@ -56,16 +56,46 @@ Managing memories, photos, videos, and documents from diverse events (such as co
 - **Deployed Backend / API Base URL**: [https://event-storager-api.vercel.app](https://event-storager-api.vercel.app)
 - **Local API Base Endpoint**: `http://localhost:5000/api/posts`
 
----
+## 8. Deploy Frontend to Vercel and Backend to Render
 
-## 8. Setup Instructions
+Use this deployment architecture:
+
+- **Database:** MongoDB Atlas
+- **Backend API:** Render Web Service
+- **Frontend:** Vercel static project
+
+### Backend project on Render
+1. Create a Render Web Service from this repository, or use the included `render.yaml` Blueprint.
+2. Set **Root Directory** to `backend`.
+3. Set **Build Command** to `npm install` and **Start Command** to `npm start`.
+4. Add `MONGO_URI`, `JWT_SECRET`, and `FRONTEND_URL` in the Render environment settings.
+5. Deploy and copy the Render service URL.
+
+### Frontend project on Vercel
+1. Import the repository again as a new Vercel project and set the project root directory to `frontend`.
+2. Set the Render backend URL in `frontend/config.js` as `window.EVENT_API_URL`.
+3. Deploy the frontend, then set its URL as Render's `FRONTEND_URL` and redeploy the backend.
+
+The frontend is plain HTML, CSS, and JavaScript, so it does not need a build command or output directory. The backend connects to MongoDB Atlas through `MONGO_URI`. Files uploaded to `backend/uploads` are not durable on Render's default filesystem; use Cloudinary, S3, MongoDB GridFS, or another object-storage provider for production uploads.
+
+## 9. Alternative: Deploy Backend to Vercel
+
+The backend also includes Vercel support if you prefer Vercel for both frontend and API:
+
+1. Import the repository into Vercel and set the project root directory to `backend`.
+2. Add `MONGO_URI`, `JWT_SECRET`, and `FRONTEND_URL` in the Vercel project settings.
+3. Deploy and set the Vercel API URL in `frontend/config.js`.
+
+Render provides the `PORT` variable automatically. Use `/health` to check the Render service, for example `https://your-service.onrender.com/health`.
+
+## 10. Setup Instructions
 
 Follow these step-by-step instructions to run Event Storager locally on your machine:
 
 ### 1. Prerequisites
 - [Node.js](https://nodejs.org/) (v16.0.0 or higher)
 - [npm](https://www.npmjs.com/) (Node Package Manager)
-- [MongoDB](https://www.mongodb.com/) (Optional: System runs with active in-memory fallback if MongoDB is not running locally)
+- [MongoDB Atlas](https://www.mongodb.com/atlas) (Recommended for production; the app uses an in-memory fallback if the database is unavailable)
 
 ### 2. Clone the Repository
 ```bash
@@ -84,7 +114,7 @@ Copy the `.env.example` file to create your local `.env` configuration file insi
 ```bash
 cp backend/.env.example backend/.env
 ```
-*(Refer to Section 9 below for required environment variable definitions).*
+*(Refer to Section 11 below for required environment variable definitions. For Atlas, copy the connection string from your cluster's Connect > Drivers screen.)*
 
 ### 5. Launch the Server
 Start the development server:
@@ -100,7 +130,7 @@ Open your Web Browser and navigate to:
 
 ---
 
-## 9. Environment Variables
+## 11. Environment Variables
 
 The application requires the following environment variables to run securely. 
 
@@ -112,5 +142,5 @@ Create a `.env` file in the `backend/` directory specifying the following keys:
 | Variable Name | Required | Description | Example Placeholder |
 | :--- | :--- | :--- | :--- |
 | `PORT` | Optional | Port number for Express server (Defaults to `5000`) | `5000` |
-| `MONGO_URI` | Required | MongoDB database connection string | `mongodb://127.0.0.1:27017/eventStorager` |
+| `MONGO_URI` | Required | MongoDB Atlas connection string | `mongodb+srv://<username>:<password>@<cluster-url>/eventStorager?retryWrites=true&w=majority` |
 | `JWT_SECRET` | Required | Secret key used for signing & verifying JWT authentication tokens | `your_secret_jwt_key_here` |

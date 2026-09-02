@@ -3,6 +3,17 @@
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
+    const API_BASE_URL = (window.EVENT_API_URL || '').replace(/\/$/, '');
+
+    function apiUrl(endpoint) {
+        return `${API_BASE_URL}${endpoint}`;
+    }
+
+    function mediaUrl(fileUrl) {
+        if (!fileUrl || fileUrl === '#') return fileUrl;
+        return /^https?:\/\//i.test(fileUrl) ? fileUrl : apiUrl(fileUrl);
+    }
+
     // --- Application State ---
     let state = {
         events: [],
@@ -145,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function verifyTokenOnLoad() {
         if (!state.token) return;
         try {
-            const response = await fetch('/api/auth/me', {
+            const response = await fetch(apiUrl('/api/auth/me'), {
                 headers: getAuthHeaders(true)
             });
             if (!response.ok) {
@@ -219,7 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
         submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Logging in...`;
 
         try {
-            const response = await fetch('/api/auth/login', {
+            const response = await fetch(apiUrl('/api/auth/login'), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ account, password })
@@ -265,7 +276,7 @@ document.addEventListener('DOMContentLoaded', () => {
         submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Creating Account...`;
 
         try {
-            const response = await fetch('/api/auth/register', {
+            const response = await fetch(apiUrl('/api/auth/register'), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, email, password })
@@ -307,7 +318,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function fetchEvents() {
         showLoading(true);
         try {
-            const response = await fetch('/api/posts');
+            const response = await fetch(apiUrl('/api/posts'));
             if (!response.ok) throw new Error('Failed to load events');
             const data = await response.json();
             state.events = data.data || data || [];
@@ -358,7 +369,7 @@ document.addEventListener('DOMContentLoaded', () => {
         submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Storing Event...`;
 
         try {
-            const response = await fetch('/api/posts', {
+            const response = await fetch(apiUrl('/api/posts'), {
                 method: 'POST',
                 headers: getAuthHeaders(false),
                 body: formData
@@ -415,7 +426,7 @@ document.addEventListener('DOMContentLoaded', () => {
         submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Saving Changes...`;
 
         try {
-            const response = await fetch(`/api/posts/${eventId}`, {
+            const response = await fetch(apiUrl(`/api/posts/${eventId}`), {
                 method: 'PUT',
                 headers: getAuthHeaders(false),
                 body: formData
@@ -443,7 +454,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function toggleLike(eventId) {
         try {
-            const response = await fetch(`/api/posts/${eventId}/like`, { method: 'POST' });
+            const response = await fetch(apiUrl(`/api/posts/${eventId}/like`), { method: 'POST' });
             if (!response.ok) throw new Error('Failed to update like');
             const updated = await response.json();
             
@@ -470,7 +481,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const response = await fetch(`/api/posts/${eventId}`, {
+            const response = await fetch(apiUrl(`/api/posts/${eventId}`), {
                 method: 'DELETE',
                 headers: getAuthHeaders(true)
             });
@@ -541,7 +552,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function createEventCardHTML(ev) {
         const id = ev._id || ev.id;
-        const fileUrl = ev.fileUrl || ev.imageUrl || '#';
+        const fileUrl = mediaUrl(ev.fileUrl || ev.imageUrl || '#');
         const fileType = ev.fileType || detectFileType(fileUrl);
         const dateFormatted = ev.createdAt ? new Date(ev.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recent';
         
@@ -597,7 +608,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function openLightbox(eventObj) {
         state.activeLightboxEvent = eventObj;
         const id = eventObj._id || eventObj.id;
-        const fileUrl = eventObj.fileUrl || eventObj.imageUrl || '';
+        const fileUrl = mediaUrl(eventObj.fileUrl || eventObj.imageUrl || '');
         const fileType = eventObj.fileType || detectFileType(fileUrl);
         
         lbCategory.textContent = eventObj.category || 'General';
